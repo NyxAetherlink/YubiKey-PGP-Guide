@@ -260,10 +260,22 @@ Because the secret **cannot be extracted from a properly programmed YubiKey**,
 if you only have one YubiKey and you lose it, the database is permanently
 inaccessible.
 
-That's why the `ykman otp chalresp --secret <hex> 2` command exists: it lets
-you explicitly read the secret from one YubiKey (breaching the hardware
-vault, but under your control) so you can program it into a backup. This is
-an intentional tradeoff — you sacrifice some security for a recovery path.
+The solution is to generate the secret yourself **before** programming
+the YubiKey. On a secure machine:
+
+    openssl rand -hex 20
+
+This outputs a 40-character hex key. Program it into both YubiKeys:
+
+    ykman otp chalresp 2 <your-40-char-hex-key>
+    ykman otp chalresp 1 <your-40-char-hex-key>
+
+Now the same secret lives on both devices, and you have it stored
+(encrypted in your password manager or on paper in a fireproof safe).
+
+> **⚠️ If you used `--generate` instead, the secret was created on the
+> YubiKey's hardware and cannot be extracted. You would need to start over
+> with a known hex key to create a backup.
 
 ---
 

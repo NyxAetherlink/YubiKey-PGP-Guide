@@ -484,6 +484,7 @@ performing an operation. Options:
 | `On`    | Touch required for *every* operation                   |
 | `Fixed` | Touch required and cannot be changed without resetting |
 | `Cached`| Touch required once, then same app can reuse for ~15s  |
+| `Cached-Fixed` | Touch once, cached for ~15s, and the policy is permanent |
 
 Set this with `ykman`:
 
@@ -1053,28 +1054,28 @@ a fallback plan:
 
    Wait — there's a catch. When you use `--generate`, the secret is generated
    *on the device* and never revealed. To use the same secret on two YubiKeys,
-   you need to:
+   you need to generate it yourself **before** programming either device:
 
-   a. Read the secret from the first YubiKey (requires Admin PIN):
+   a. Generate a 40-character hex key:
       ```bash
-      ykman otp chalresp --secret 2
-      ```
-      This outputs the secret in hex.
-
-   b. Program the second YubiKey with the same secret:
-      ```bash
-      ykman otp chalresp --secret <hex-from-step-a> 2
+      openssl rand -hex 20
       ```
 
-   > **⚠️ Security tradeoff:** You're intentionally taking a secret that was
-   > generated in the YubiKey's secure hardware and putting it into
-   > software-controlled memory (and your shell history). Do this in a secure
-   > environment on a machine you trust. After you program the backup key,
-   > consider clearing your shell history: `history -c && history -w`.
+   b. Program both YubiKeys with the same hex key:
+      ```bash
+      ykman otp chalresp 2 <your-hex-key>
+      ykman otp chalresp 1 <your-hex-key>   # backup slot on same device
+      ```
 
-3. **Emergency paper backup:** Print the secret (hex-encoded) and store it
-   in a safe deposit box. You can recreate the YubiKey slot from this hex
-   value using the `--secret` option above.
+   > **⚠️ Security:** If you use `--generate`, the secret is created on the
+   > YubiKey's hardware and can never be read back. You would need to factory
+   > reset and start over with a known hex key if you want a backup. Always
+   > use a known hex key from `openssl rand -hex 20` if you plan to back up.
+   > Store the hex string in an encrypted password manager, not in a text file.
+
+3. **Emergency paper backup:** Generate a hex key with `openssl rand -hex 20`,
+   print it, and store it in a safe deposit box. You can recreate the YubiKey
+   slot on any device with `ykman otp chalresp 2 <hex>`.
 
 4. **Password-only fallback:** KeePassXC lets you create an *emergency
    sheet* — a one-time recovery code or a separate key file. Enable this in
@@ -1203,7 +1204,7 @@ All `ykman` commands for quick reference.
 ```bash
 ykman info                          # Display YubiKey model, firmware, interfaces
 ykman list                          # List connected YubiKeys
-ykman config set <interface>        # Enable/disable interfaces (FIDO2, OTP, CCID, etc.)
+ykman config usb --enable <interface>  # Enable/disable USB interfaces (FIDO2, OTP, CCID, etc.)
 ```
 
 ### OpenPGP Applet
@@ -1216,7 +1217,7 @@ ykman openpgp keys set-touch ENC on # Set touch policy for encryption key
 ykman openpgp keys set-touch AUT on # Set touch policy for auth key
 ykman openpgp keys set-touch SIG cached  # Cached touch (reuse for ~15s)
 ykman openpgp keys set-touch SIG off     # Disable touch requirement
-ykman openpgp certifcate export      # Export OpenPGP applet certificate
+ykman openpgp certificates export <key> <cert>  # Export OpenPGP certificate
 ```
 
 ### OTP / Challenge-Response (for KeePass)
@@ -1225,8 +1226,8 @@ ykman openpgp certifcate export      # Export OpenPGP applet certificate
 ykman otp info                      # Show configured OTP slots
 ykman otp chalresp --generate 1     # Program slot 1 for challenge-response (new random secret)
 ykman otp chalresp --generate 2     # Program slot 2 for challenge-response (new random secret)
-ykman otp chalresp --secret <hex> 2 # Program slot 2 with a known secret (backup YubiKey)
-ykman otp chalresp --secret 2       # Display the secret programmed in slot 2 (requires touch)
+ykman otp chalresp 2 <hex>              # Program slot 2 with a known secret (backup YubiKey)
+ykman otp chalresp --generate 2         # Generate a new random secret on-device (no backup possible)
 ykman otp delete 1                  # Clear slot 1 (restore to factory default)
 ykman otp delete 2                  # Clear slot 2
 ```
@@ -1286,7 +1287,7 @@ gpg: error getting version: No such device
 6. **YubiKey not in CCID mode:** The YubiKey needs to have the CCID interface
    enabled. Check with `ykman info`. If CCID is disabled:
    ```bash
-   ykman config set ccid --enable
+   ykman config usb --enable CCID
    ```
 
 ### "Inappropriate ioctl for device" on `gpg --card-status`

@@ -830,6 +830,7 @@ td code{font-size:11px;background:#1e293b;padding:1px 5px;border-radius:3px;colo
   <tr><td><code>On</code></td><td>Tap required for every operation</td><td>Signing (maximum security)</td></tr>
   <tr><td><code>Cached</code></td><td>Tap once, app reuses for ~15 seconds</td><td>Batch decryption (balance)</td></tr>
   <tr><td><code>Fixed</code></td><td>Like On, but can't be changed without factory reset</td><td>High-security / threat model</td></tr>
+  <tr><td><code>Cached-Fixed</code></td><td>Tap once, cached ~15s, policy is permanent</td><td>Use-once-per-session + permanent</td></tr>
 </table>
 
 <div class="terminal" id="term4d">
@@ -1193,7 +1194,7 @@ td code{font-size:11px;background:#1e293b;padding:1px 5px;border-radius:3px;colo
 
 <div class="info-box tip">
 <h4>💡 Why Both Slots?</h4>
-<p>Slot 2 (long-press) is your daily driver. Slot 1 (short-tap) backs it up on the <strong>same device</strong>. If slot 2 ever gets corrupted or you accidentally overwrite it, slot 1 saves you. For true hardware redundancy, program a second YubiKey with <code>ykman otp chalresp --secret &lt;hex&gt; 2</code> using the backup procedure below.</p>
+<p>Slot 2 (long-press) is your daily driver. Slot 1 (short-tap) backs it up on the <strong>same device</strong>. If slot 2 ever gets corrupted or you accidentally overwrite it, slot 1 saves you. For true hardware redundancy, program a second YubiKey with <code>ykman otp chalresp 2 &lt;hex&gt;</code> using the backup procedure below.</p>
 </div>
 
 <h3>Step 2: Link KeePassXC to the YubiKey</h3>
@@ -1293,8 +1294,8 @@ td code{font-size:11px;background:#1e293b;padding:1px 5px;border-radius:3px;colo
   </div>
 </div>
 
-<p><strong>Option 1: Backup YubiKey — Read & Replicate the Secret</strong></p>
-<p>First, extract the hex secret from your primary YubiKey:</p>
+<p><strong>Option 1: Backup YubiKey — Pre-Generate a Known Secret</strong></p>
+<p>The safest approach: generate the hex secret yourself <strong>before</strong> programming either YubiKey, then program both devices with the same key.</p>
 
 <div class="terminal" id="term7d">
   <div class="terminal-bar">
@@ -1302,16 +1303,18 @@ td code{font-size:11px;background:#1e293b;padding:1px 5px;border-radius:3px;colo
     <span class="terminal-title">terminal — bash</span>
   </div>
   <div class="terminal-body">
-    <div class="prompt">$ <span class="cmd">ykman otp chalresp --secret 2</span></div>
+    <div class="prompt">$ <span class="cmd">openssl rand -hex 20</span></div>
     <div id="term7dout"></div>
     <div style="margin-top:10px">
-      <button class="cmd-btn" id="cmd7dbtn" onclick="runCommand('7d')">▶ Read slot 2 secret</button>
+      <button class="cmd-btn" id="cmd7dbtn" onclick="runCommand('7d')">▶ Generate hex key</button>
     </div>
   </div>
 </div>
 
 <ol start="2">
-  <li>Program a second YubiKey with the same hex secret: <code>ykman otp chalresp --secret &lt;hex&gt; 2</code></li>
+  <li>Program your primary YubiKey (slot 2): <code>ykman otp chalresp 2 &lt;hex&gt;</code></li>
+  <li>Program slot 1 as a backup on the same device: <code>ykman otp chalresp 1 &lt;hex&gt;</code></li>
+  <li>Program a second YubiKey with the same hex key: <code>ykman otp chalresp 2 &lt;hex&gt;</code></li>
   <li>Store the backup YubiKey somewhere safe (safe deposit box, locked drawer)</li>
 </ol>
 
@@ -1331,12 +1334,12 @@ td code{font-size:11px;background:#1e293b;padding:1px 5px;border-radius:3px;colo
   </div>
 </div>
 
-<p><strong>Option 3: Print the hex secret</strong></p>
-<p>Run <code>ykman otp chalresp --secret 2</code> (see Option 1), copy the hex string, and write it on paper. Store it somewhere fireproof. You can later recreate the slot with <code>ykman otp chalresp --secret &lt;hex&gt; 2</code> on any YubiKey.</p>
+<p><strong>Option 3: Print the hex secret for cold storage</strong></p>
+<p>Before programming, save the hex output from <code>openssl rand -hex 20</code> and write it on paper. Store it somewhere fireproof. You can recreate the slot with <code>ykman otp chalresp 2 &lt;hex&gt;</code> on any YubiKey.</p>
 
 <div class="info-box danger">
-<h4>🔴 Important Security Tradeoff</h4>
-<p>When you read the secret from the YubiKey with <code>ykman otp chalresp --secret 2</code>, it prints the hex to your terminal — which means it exists in your computer's memory and potentially your shell history. Do this on a trusted machine and clear your shell history afterward (<code>history -c && history -w</code>).</p>
+<h4>🔴 Important Security Note</h4>
+<p>The hex key should be generated on a trusted, offline-capable machine. Once you use it, the hex string exists in your shell history. Clear it immediately: <code>history -c && history -w</code>. Then consider overwriting your <code>~/.bash_history</code> file with <code>shred -u ~/.bash_history</code> to prevent forensic recovery. Store the hex string in an encrypted password manager — not as a plain text file.</p>
 </div>
 
 <h3>Knowledge Check</h3>
@@ -1352,7 +1355,7 @@ td code{font-size:11px;background:#1e293b;padding:1px 5px;border-radius:3px;colo
 </div>
 
 <div class="practice-box">
-<p>If you run <code>ykman otp chalresp --secret 2</code> to back up your secret, what must you do immediately afterward?</p>
+<p>If you generate a hex key with <code>openssl rand -hex 20</code> and program your YubiKeys, what must you do with the hex string afterward?</p>
 <div id="quiz7c"></div>
 </div>
 </div>
@@ -1948,20 +1951,18 @@ Now your backup YubiKey (or second slot) can unlock the same database.`,
     label: 'ykman otp chalresp --generate 1'
   },
   '7d': {
-    output: `<strong class="highlight">Secret (hex): b8a73f2c19e46d50a1f83c27b49e05d6f73a2c18</strong>
+    output: `<strong class="highlight">b8a73f2c19e46d50a1f83c27b49e05d6f73a2c18</strong>
 
-<strong class="warn">⚠️  WARNING: This secret was printed to your terminal screen.
-It now exists in your computer's memory and shell history.
+<strong class="warn">⚠️  Store this 40-character hex string in your password manager
+before you program it into a YubiKey. Once programmed, clear your
+shell history:
 
-Clear your shell history immediately:
-  $ history -c && history -w</strong>
+  $ history -c && history -w
+  $ shred -u ~/.bash_history
 
-Store this 40-character hex string somewhere safe (password manager,
-offline safe, sealed envelope). You can use it to:
-  • Program a replacement YubiKey (any slot)
-  • Restore after a factory reset
-  • Share across multiple YubiKeys`,
-    label: 'ykman otp chalresp --secret 2'
+Use the hex to program any YubiKey slot:
+  $ ykman otp chalresp 2 b8a73f2c19e46d50a1f83c27b49e05d6f73a2c18</strong>`,
+    label: 'openssl rand -hex 20'
   },
   '7e': {
     output: `<strong class="success">✓ Emergency sheet generated</strong>
@@ -2168,18 +2169,18 @@ const QUIZZES = {
       'Take a photo of your YubiKey'
     ],
     correct: 2,
-    explanation: 'A backup YubiKey with the same slot 2 secret (programmed via --secret) gives you a hardware replacement if you lose the primary. An emergency recovery sheet from KeePassXC gives you a one-time password-only bypass. Both together = full coverage.'
+    explanation: 'A backup YubiKey with the same slot 2 secret (programmed with the same hex key) gives you a hardware replacement if you lose the primary. An emergency recovery sheet from KeePassXC gives you a one-time password-only bypass. Both together = full coverage.'
   },
   '7c': {
-    question: 'If you run `ykman otp chalresp --secret 2` to back up your secret, what must you do immediately afterward?',
+    question: 'After generating a hex key with `openssl rand -hex 20` and programming your YubiKeys, what should you do with the hex string?',
     options: [
       'Post the secret in your team Slack for safekeeping',
-      'Store the hex string in a safe place, then clear your shell history',
+      'Store the hex string in an encrypted password manager, then clear your shell history',
       'Run `ykman otp chalresp --generate 2` again to create a new secret',
-      'Nothing — the YubiKey auto-deletes any secret that was printed'
+      'Nothing — you already programmed both YubiKeys'
     ],
     correct: 1,
-    explanation: 'When you read the secret from the YubiKey, it displays on your terminal screen and ends up in your shell history (via ~/.bash_history). Anyone who accesses your terminal later can see the hex string. Store it somewhere safe immediately, then clear your history with `history -c && history -w`.'
+    explanation: 'The 40-character hex string from openssl rand lets you restore your challenge-response setup on any YubiKey. Save it in an encrypted password manager, then clear your shell history with `history -c && history -w` and overwrite the file with `shred -u ~/.bash_history` to prevent forensic recovery.'
   }
 };
 

@@ -84,11 +84,11 @@ ykman openpgp reset
 # Generate new secret on-device (recommended)
 ykman otp chalresp --generate 2
 
-# Program second YubiKey with same secret
-ykman otp chalresp --secret <hex> 2
+# Program second YubiKey with same hex key
+ykman otp chalresp 2 <hex>
 
-# Read existing secret from slot 2 (requires touch)
-ykman otp chalresp --secret 2
+# Pre-generate a hex key for both devices
+openssl rand -hex 20
 ```
 
 ## Backup
