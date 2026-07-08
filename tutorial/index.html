@@ -1023,7 +1023,7 @@ td code{font-size:11px;background:#1e293b;padding:1px 5px;border-radius:3px;colo
           <span style="flex:1">Status</span>
         </div>
         <div style="display:flex;gap:20px;padding:8px 0;border-bottom:1px solid #0f172a">
-          <span style="flex:2;color:#4ade80">✅ Nyx &lt;nyx@example.com&gt;</span>
+          <span style="flex:2;color:#4ade80">✅ Johnny &lt;johnny@example.com&gt;</span>
           <span style="flex:1;color:#c4c4d0">0xABCD…7890</span>
           <span style="flex:1"><span style="color:#06b6d4;font-size:9px;background:#06b6d418;padding:2px 8px;border-radius:3px">Valid ✓</span></span>
         </div>
@@ -1642,7 +1642,7 @@ Key is valid for? (0 = no expiry): <strong class="highlight">2y</strong>
 
 pub   rsa4096/<strong class="highlight">0xABCDEF1234567890</strong> 2026-06-17 [C] [expires: 2028-06-17]
       Key fingerprint = A1B2 C3D4 E5F6 7890 1234  5678 9ABC DEF1 2345 6789
-uid                   [ultimate] <strong class="highlight">Nyx &lt;nyx@example.com&gt;</strong>`,
+uid                   [ultimate] <strong class="highlight">Johnny &lt;johnny@example.com&gt;</strong>`,
     label: 'gpg --expert --full-generate-key'
   },
   '3b': {
@@ -1807,7 +1807,7 @@ Touch your YubiKey to confirm...
   5: {
     output: `sec   rsa4096/0xABCDEF1234567890 2026-06-17 [C] [expires: 2028-06-17]
       Key fingerprint = A1B2 C3D4 E5F6 7890 1234  5678 9ABC DEF1 2345 6789
-uid                   [ultimate] Nyx &lt;nyx@example.com&gt;
+uid                   [ultimate] Johnny &lt;johnny@example.com&gt;
 ssb   rsa4096/0xSUBSIGNKEY12345 2026-06-17 [S] [expires: 2028-06-17]
 ssb   rsa4096/0xSUBENCRYPTKEY678 2026-06-17 [E] [expires: 2028-06-17]
 ssb   rsa4096/0xSUBAUTHKEY90123 2026-06-17 [A] [expires: 2028-06-17]
@@ -1881,7 +1881,7 @@ gpg> <strong class="highlight">save</strong>`,
   },
   '5c': {
     output: `sec   rsa4096/0xABCDEF1234567890 2026-06-17 [C] [expires: 2028-06-17]
-uid                   [ultimate] Nyx &lt;nyx@example.com&gt;
+uid                   [ultimate] Johnny &lt;johnny@example.com&gt;
 ssb<strong class="highlight">></strong>  rsa4096/0xSUBSIGNKEY12345 2026-06-17 [S] [expires: 2028-06-17]
      <strong class="highlight">card-no: 0006XXXXXX</strong>
 ssb<strong class="highlight">></strong>  rsa4096/0xSUBENCRYPTKEY678 2026-06-17 [E] [expires: 2028-06-17]
@@ -1909,7 +1909,7 @@ iHUEARYKAB0WIQSps8zU5vZ4kQASNFZ3m7rvAAAAAAAKCRB3m7rvAAAAAP9qAgDZ
     label: 'Test signing'
   },
   '5d2': {
-    output: `$ echo "secret data" | gpg --encrypt --recipient nyx@example.com | gpg --decrypt
+    output: `$ echo "secret data" | gpg --encrypt --recipient johnny@example.com | gpg --decrypt
 <strong class="success">secret data</strong>
 
 <strong class="success">✓ Encryption + decryption works!</strong>

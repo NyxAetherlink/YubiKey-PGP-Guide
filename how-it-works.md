@@ -284,7 +284,7 @@ Now the same secret lives on both devices, and you have it stored
 ### Web of Trust vs. Centralized PKI
 
 TLS (HTTPS) uses a **Certificate Authority** model: a small set of companies
-decide who is who. If Verisign says you're Nyx, then you're Nyx. This is
+decide who is who. If Verisign says you're Johnny, then you're Johnny. This is
 centralized and requires trusting third parties.
 
 PGP uses a **Web of Trust**: you decide who to trust. When you sign someone

@@ -217,7 +217,7 @@ You'll be prompted:
    > expiration can always be pushed forward with the master key — it's not a
    > hard deadline.
 
-5. **Real name**: Your name or pseudonym (e.g., `Nyx`).
+5. **Real name**: Your name or pseudonym (e.g., `Johnny`).
 
 6. **Email address**: The email you'll associate with this key.
 
@@ -233,7 +233,7 @@ you'll use it to reference the key.
 ```
 pub   rsa4096/0xABCDEF1234567890 2026-06-17 [SC]
       Key fingerprint = A1B2 C3D4 E5F6 7890 1234  5678 9ABC DEF1 2345 6789
-uid                   [ultimate] Nyx <nyx@example.com>
+uid                   [ultimate] Johnny <johnny@example.com>
 ```
 
 The `Key ID` is the last 16 hex digits of the fingerprint:
@@ -321,7 +321,7 @@ Your key now looks like this (check with `gpg --list-key 0x...`):
 
 ```
 pub   rsa4096/0xABCDEF1234567890 2026-06-17 [SC] [expires: 2028-06-17]
-uid                   [ultimate] Nyx <nyx@example.com>
+uid                   [ultimate] Johnny <johnny@example.com>
 sub   rsa4096/0xSUBSIGNKEY12345 2026-06-17 [S] [expires: 2028-06-17]
 sub   rsa4096/0xSUBENCRYPTKEY678 2026-06-17 [E] [expires: 2028-06-17]
 sub   rsa4096/0xSUBAUTHKEY90123 2026-06-17 [A] [expires: 2028-06-17]
@@ -437,12 +437,12 @@ Still in `gpg --edit-card` admin mode, you can set identifying info:
 
 ```gpg
 gpg/card> login
-Your login: nyx@example.com    # URL or email
+Your login: johnny@example.com    # URL or email
 ```
 
 ```gpg
 gpg/card> name
-Cardholder's surname: Nyx
+Cardholder's surname: Johnny
 Cardholder's given name:
 ```
 
@@ -688,7 +688,7 @@ message output.
 Test encryption:
 
 ```bash
-echo "test message" | gpg --encrypt --recipient nyx@example.com | gpg --decrypt
+echo "test message" | gpg --encrypt --recipient johnny@example.com | gpg --decrypt
 ```
 
 You should see your original message after entering your PIN.
@@ -728,7 +728,7 @@ Kleopatra lists all keys in its main window. Your key shows up as:
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Nyx <nyx@example.com>                              │
+│  Johnny <johnny@example.com>                              │
 │  ✅ OpenPGP Key — [SC] [E] [A]                      │
 │  Key ID: 0xABCDEF1234567890                         │
 │  YubiKey present (card-no: 0006XXXXXX)              │
